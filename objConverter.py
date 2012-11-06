@@ -1,6 +1,16 @@
 import sys     # exit, argv
 import struct  # pack
 
+# Texture Origin Constant Transforms
+# .obj has bottom left as texture origin
+TO_TOPLEFT     = lambda x,y,z : (x, 1.0 - y, z)
+TO_BOTTOMLEFT  = lambda x,y,z : (x, y, z)
+TO_BOTTOMRIGHT = lambda x,y,z : (1.0 - x, y, z)
+TO_TOPRIGHT    = lambda x,y,z : (1.0 - x, 1.0 - y, z)
+
+# DirectX/OpenGL Style textures.
+TextureOriginTransformation = TO_TOPLEFT
+
 # NOTE: Change this for whatever architecture will be reading
 #       the output file.
 BIG_ENDIAN = True
@@ -47,7 +57,10 @@ def AppendTC(texCoordList, line):
     print "INFO: " + str(UV)
     Error("Malformed Texture Coordinate: '%s'" % line)
     
+  # Convert from string to float
   UV = [float(x) for x in UV]
+  # Transform the origin from bottom left to whatever origin is desired
+  UV = TextureOriginTransformation(UV[0], UV[1], UV[2])
     
   texCoordList.append(tuple(UV))
   
